@@ -17,6 +17,7 @@
             </a>
         </li><!-- End Keranjang Nav --> 
 
+
         <?php
           if (session()->get('role') == 'admin') {
           ?>
@@ -30,6 +31,12 @@
           <?php
           }
           ?>
+       <li class="nav-item">
+            <a class="nav-link <?php echo (uri_string() == 'contact') ? "" : "collapsed" ?>" href="contact">
+            <i class="bi bi-file-person-fill"></i>
+            <span>Contact</span>
+            </a>
+        </li>
         
     </ul>
 
