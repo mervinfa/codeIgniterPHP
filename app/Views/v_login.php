@@ -5,13 +5,18 @@
 $username = [
     'name' => 'username',
     'id' => 'username',
-    'class' => 'form-control'
+    'class' => 'form-control',
+    'required' => 'required',
+    'minlength' => '6'
 ];
 
 $password = [
     'name' => 'password',
     'id' => 'password',
-    'class' => 'form-control'
+    'class' => 'form-control',
+    'required' => 'required',
+    'minlength' => '7',
+    'inputmode' => 'numeric'    
 ];
 ?>
 
