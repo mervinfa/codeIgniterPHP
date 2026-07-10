@@ -15,6 +15,11 @@
         <button type="submit" title="Search"><i class="bi bi-search"></i></button>
       </form>
     </div><!-- End Search Bar -->
+    <?php if (isset($activeDiscount) && !empty($activeDiscount)) : ?>
+    <div class="alert alert-success text-center mb-4">
+        💚 Hari ini ada diskon <strong><?= number_to_currency($activeDiscount['nominal'], 'IDR') ?></strong> per item!
+    </div>
+<?php endif; ?>
 
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">

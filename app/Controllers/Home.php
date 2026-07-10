@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\ProductModel; 
+use App\Models\DiscountModel;
 
 class Home extends BaseController
 {
@@ -13,13 +14,28 @@ class Home extends BaseController
     $this->productModel = new ProductModel();
     }
 
-    public function index(): string
-    {
-        $products = $this->productModel->findAll();
-        $data['products'] = $products;
+    public function index()
+{
+    // 1. WAJIB SET TIMEZONE BIAR SAMA DENGAN JAM LAPTOPMU (WIB)
+    date_default_timezone_set('Asia/Jakarta');
 
-        return view('v_home', $data);
-    }
+    $productModel  = new ProductModel();
+    $discountModel = new DiscountModel();
+
+    // 2. Mengambil tanggal hari ini (Akan menghasilkan '2026-07-09')
+    $today = date('Y-m-d'); 
+
+    // 3. Cari diskon yang cocok dengan tanggal hari ini
+    $activeDiscount = $discountModel->where('tanggal', $today)->first();
+
+    // 4. Kirim datanya ke view v_home
+    $data = [
+        'products'       => $productModel->findAll(),
+        'activeDiscount' => $activeDiscount 
+    ];
+
+    return view('v_home', $data);
+}
 
      public function contact(): string
     {

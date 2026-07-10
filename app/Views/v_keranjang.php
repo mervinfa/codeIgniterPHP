@@ -11,7 +11,6 @@ if (session()->getFlashData('success')) {
 }
 ?> 
 <?php echo form_open('keranjang/edit') ?>
-<!-- Table with stripped rows -->
 <table class="table datatable">
     <thead>
         <tr>
@@ -26,15 +25,40 @@ if (session()->getFlashData('success')) {
     <tbody>
         <?php
         $i = 1;
+        $grandTotal = 0; // Variabel baru untuk menghitung total keseluruhan
+        
+        // Ambil nominal diskon dari controller (jika ada)
+        $nominalDiskon = isset($activeDiscount) ? $activeDiscount['nominal'] : 0;
+
         if (!empty($items)) :
             foreach ($items as $index => $item) :
+                $hargaAsli = $item['price'];
+                $hargaDiskon = $hargaAsli - $nominalDiskon;
+                
+                // Jaga-jaga agar harga tidak minus jika diskon lebih besar dari harga barang
+                if ($hargaDiskon < 0) {
+                    $hargaDiskon = 0;
+                }
+                
+                // Subtotal per item menggunakan harga yang sudah didiskon
+                $subtotalItem = $hargaDiskon * $item['qty'];
+                
+                // Tambahkan ke Total Keseluruhan
+                $grandTotal += $subtotalItem;
         ?>
                 <tr>
                     <td><?php echo $item['name'] ?></td>
                     <td><img src="<?php echo base_url() . "img/" . $item['options']['foto'] ?>" width="100px"></td>
-                    <td><?php echo number_to_currency($item['price'], 'IDR') ?></td> 
+                    <td>
+                        <?php if ($nominalDiskon > 0) : ?>
+                            <del class="text-danger"><?php echo number_to_currency($hargaAsli, 'IDR') ?></del><br>
+                            <?php echo number_to_currency($hargaDiskon, 'IDR') ?>
+                        <?php else : ?>
+                            <?php echo number_to_currency($hargaAsli, 'IDR') ?>
+                        <?php endif; ?>
+                    </td> 
                     <td><input type="number" min="1" name="qty<?php echo $i++ ?>" class="form-control" value="<?php echo $item['qty'] ?>"></td>
-                    <td><?php echo number_to_currency($item['subtotal'], 'IDR') ?></td>
+                    <td><?php echo number_to_currency($subtotalItem, 'IDR') ?></td>
                     <td>
                         <a href="<?php echo base_url('keranjang/delete/' . $item['rowid'] . '') ?>" class="btn btn-danger"><i class="bi bi-trash"></i></a>
                     </td>
@@ -45,8 +69,9 @@ if (session()->getFlashData('success')) {
         ?>
     </tbody>
 </table> 
+
 <div class="alert alert-info">
-    <?php echo "Total = " . number_to_currency($total, 'IDR') ?>
+    <?php echo "Total = " . number_to_currency($grandTotal, 'IDR') ?>
 </div>
 
 <button type="submit" class="btn btn-primary">Perbarui Keranjang</button>

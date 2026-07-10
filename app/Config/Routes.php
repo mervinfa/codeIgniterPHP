@@ -30,15 +30,26 @@ $routes->group('keranjang', ['filter' => 'auth'], function ($routes) {
 });
 
 $routes->get('checkout', 'TransaksiController::checkout', ['filter' => 'auth']);
-$routes->post('buy', 'TransaksiController::buy', ['filter' => 'auth']);
-$routes->get('history', 'TransaksiController::history', ['filter' => 'auth']);
+$routes->post('checkout/buy', 'TransaksiController::buy', ['filter' => 'auth']);$routes->get('history', 'TransaksiController::history', ['filter' => 'auth']);
 
 $routes->get('ajax/destinations','TransaksiController::destinations', ['filter' => 'auth']);
 $routes->get('ajax/costs','TransaksiController::costs', ['filter' => 'auth']);
 
 $routes->resource('api/products', ['controller' => 'Api\ProdukController']);
+$routes->resource('api/discounts', ['controller' => 'Api\DiskonController']);
 
 $routes->get('api/transactions', 'Api\TransaksiController::index');
+
+// Tulis terpisah di bagian bawah file Routes.php kamu:
+$routes->get('diskon', 'DiskonController::index');
+$routes->post('diskon/store', 'DiskonController::store');
+$routes->post('diskon/update/(:num)', 'DiskonController::update/$1');
+$routes->get('diskon/delete/(:num)', 'DiskonController::delete/$1');
+
+$routes->group('pembelian', ['filter' => 'auth'], function ($routes) { // <-- Ganti jadi auth
+    $routes->get('', 'PembelianController::index');
+    $routes->post('ubah-status/(:num)', 'PembelianController::ubah_status/$1');
+});
 
 $routes->get('keranjang', 'TransaksiController::index', ['filter' => 'auth']);
 $routes->get('contact', 'Home::contact', ['filter' => 'role']);
