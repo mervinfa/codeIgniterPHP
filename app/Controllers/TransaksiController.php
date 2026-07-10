@@ -208,35 +208,34 @@ class TransaksiController extends BaseController
         return redirect()->back()->with('success', 'Status pembayaran berhasil diperbarui!');
     }
 
-    // =================================================================
-    // FUNGSI API RAJAONGKIR (Yang Sempat Hilang)
-    // =================================================================
-    
     public function destinations()
-{
-    $search = $this->request->getGet('search'); // mengambil apa yang diketik user
-    $service = new \App\Services\RajaOngkirService();
-    
-    // Panggil service API
-    $response = $service->getDestination($search ?? '');
+    {
+        // 1. Ambil kata kunci ketikan dari kotak pencarian Select2 (menggunakan 'q')
+        $search = $this->request->getGet('q'); 
+        
+        // 2. Panggil API Komerce/RajaOngkir untuk mencari daerah
+        $service = new \App\Services\RajaOngkirService();
+        $response = $service->getDestination($search ?? '');
+        
+        // 3. Ambil isi datanya 
+        $dataFromApi = $response['data'] ?? $response['results'] ?? [];
+        
+        // 4. Ubah formatnya agar bisa dibaca oleh Select2 (Wajib ada 'id' dan 'text')
+        $formattedResults = [];
+        if (!empty($dataFromApi) && is_array($dataFromApi)) {
+            foreach ($dataFromApi as $item) {
+                $formattedResults[] = [
+                    'id'   => $item['id'] ?? $item['subdistrict_id'] ?? '', 
+                    'text' => $item['label'] ?? $item['subdistrict_name'] ?? $item['city_name'] ?? 'Nama daerah tidak terbaca'
+                ];
+            }
+        }
 
-    // API Komerce biasanya membungkus datanya di dalam key 'data'
-    $dataFromApi = $response['data'] ?? [];
-
-    $formattedResults = [];
-    foreach ($dataFromApi as $item) {
-        $formattedResults[] = [
-            'id'   => $item['id'], // ID destinasi untuk disimpan ke database
-            'text' => $item['label'] ?? $item['subdistrict_name'] ?? '' // Teks yang muncul di dropdown select2
-        ];
+        // 5. Kembalikan ke browser dengan bungkus "results"
+        return $this->response->setJSON([
+            'results' => $formattedResults
+        ]);
     }
-
-    // WAJIB dikembalikan dalam bentuk json dengan key 'results'
-    return $this->response->setJSON([
-        'results' => $formattedResults
-    ]);
-}
-
     public function costs()
     {
         $origin = '64999';

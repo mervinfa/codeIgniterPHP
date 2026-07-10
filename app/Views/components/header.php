@@ -16,9 +16,11 @@
       </form>
     </div><!-- End Search Bar -->
     <?php if (isset($activeDiscount) && !empty($activeDiscount)) : ?>
-    <div class="alert alert-success text-center mb-4">
-        💚 Hari ini ada diskon <strong><?= number_to_currency($activeDiscount['nominal'], 'IDR') ?></strong> per item!
+
+    <div class="d-inline-block bg-success text-white rounded-pill px-3 py-2 fw-bold shadow-sm" style="font-size: 14px;">
+    Hari ini ada diskon <?= number_to_currency($activeDiscount['nominal'], 'IDR') ?> per item!
     </div>
+    
 <?php endif; ?>
 
     <nav class="header-nav ms-auto">
