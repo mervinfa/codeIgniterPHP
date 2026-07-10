@@ -6,7 +6,6 @@ use CodeIgniter\RESTful\ResourceController;
 
 class DiskonController extends ResourceController
 {
-    // UBAH BARIS INI: Panggil DiscountModel (bukan DiskonModel)
     protected $modelName = 'App\Models\DiscountModel'; 
     protected $format    = 'json';
 
@@ -27,6 +26,15 @@ class DiskonController extends ResourceController
     public function create()
     {
         $data = $this->request->getJSON(true);
+        
+        if (empty($data)) {
+            $data = $this->request->getPost();
+        }
+
+        if (empty($data)) {
+            return $this->fail('Gagal: Data yang dikirim kosong atau format Header tidak sesuai.');
+        }
+
         if ($this->model->insert($data)) {
             return $this->respondCreated(['message' => 'Data Diskon berhasil ditambahkan']);
         }
@@ -36,6 +44,19 @@ class DiskonController extends ResourceController
     public function update($id = null)
     {
         $data = $this->request->getJSON(true);
+        
+        if (empty($data)) {
+            $data = $this->request->getRawInput();
+        }
+
+        if (empty($data)) {
+            return $this->fail('Gagal: Data yang dikirim kosong.');
+        }
+
+        if (!$this->model->find($id)) {
+            return $this->failNotFound('Data Diskon yang ingin diubah tidak ditemukan.');
+        }
+
         if ($this->model->update($id, $data)) {
             return $this->respond(['message' => 'Data Diskon berhasil diubah']);
         }
@@ -44,9 +65,10 @@ class DiskonController extends ResourceController
 
     public function delete($id = null)
     {
-        if ($this->model->delete($id)) {
+        if ($this->model->find($id)) {
+            $this->model->delete($id);
             return $this->respondDeleted(['message' => 'Data Diskon berhasil dihapus']);
         }
-        return $this->failNotFound('Data Diskon gagal dihapus');
+        return $this->failNotFound('Data Diskon yang ingin dihapus tidak ditemukan.');
     }
 }

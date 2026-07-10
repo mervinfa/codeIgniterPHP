@@ -8,7 +8,6 @@ class CreateDiscountTable extends Migration
 {
     public function up()
     {
-        // Menyusun struktur field tabel discounts sesuai Soal 1
         $this->forge->addField([
             'id' => [
                 'type'           => 'INT',
@@ -18,7 +17,7 @@ class CreateDiscountTable extends Migration
             ],
             'tanggal' => [
                 'type'       => 'DATE',
-                'unique'     => true, // Mencegah data kembar untuk tanggal yang sama
+                'unique'     => true, 
             ],
             'nominal' => [
                 'type'       => 'DOUBLE',
@@ -37,16 +36,13 @@ class CreateDiscountTable extends Migration
             ],
         ]);
 
-        // Menentukan Primary Key
         $this->forge->addKey('id', true);
 
-        // Membuat tabel bernama 'discounts'
         $this->forge->createTable('discounts');
     }
 
     public function down()
     {
-        // Menghapus tabel jika dilakukan rollback
         $this->forge->dropTable('discounts');
     }
 }

@@ -24,7 +24,6 @@ class TransaksiController extends BaseController
         $this->discountModel = new DiscountModel();
     }
 
-    // Menampilkan isi keranjang belanja asli tokomu
     public function index()
     {
         date_default_timezone_set('Asia/Jakarta');
@@ -32,7 +31,6 @@ class TransaksiController extends BaseController
         $items = $this->cart->contents();
         $total = $this->cart->total(); 
 
-        // Ambil diskon aktif hari ini berdasarkan tanggal server
         $today = date('Y-m-d');
         $activeDiscount = $this->discountModel->where('tanggal', $today)->first();
 
@@ -46,8 +44,6 @@ class TransaksiController extends BaseController
         return view('v_keranjang', $data);
     }
 
-    // SOAL 4: Fungsi Utama Proses Checkout dari Tombol "Selesai Belanja"
-// Fungsi ini CUMA menampilkan halaman formulir checkout & ringkasan belanja
     public function checkout()
     {
         date_default_timezone_set('Asia/Jakarta');
@@ -58,7 +54,6 @@ class TransaksiController extends BaseController
             return redirect()->to(base_url('keranjang'))->with('error', 'Keranjang belanja kosong');
         }
 
-        // Ambil data diskon aktif hari ini
         $today = date('Y-m-d');
         $activeDiscount = $this->discountModel->where('tanggal', $today)->first();
 
@@ -69,11 +64,9 @@ class TransaksiController extends BaseController
             'title'          => 'Checkout'
         ];
 
-        // Membuka file view checkout milikmu (pastikan nama filenya sesuai, misal v_checkout)
         return view('v_checkout', $data); 
     }
 
-    // Fungsi ini yang memproses data ke database saat tombol "Buat Pesanan" diklik
     public function buy()
     {
         $items = $this->cart->contents();
@@ -84,13 +77,11 @@ class TransaksiController extends BaseController
         $db = \Config\Database::connect();
         $db->transStart();
 
-        // 1. Ambil nominal diskon hari ini
         date_default_timezone_set('Asia/Jakarta');
         $today = date('Y-m-d');
         $activeDiscount = $this->discountModel->where('tanggal', $today)->first();
         $nominalDiskon = isset($activeDiscount) ? $activeDiscount['nominal'] : 0;
 
-        // 2. Hitung total harga belanja yang sudah dipotong diskon per item
         $subtotalSetelahDiskon = 0;
         foreach ($items as $item) {
             $hargaDiskon = $item['price'] - $nominalDiskon;
@@ -98,11 +89,9 @@ class TransaksiController extends BaseController
             $subtotalSetelahDiskon += ($hargaDiskon * $item['qty']);
         }
 
-        // 3. Tambahkan ongkir dari inputan form
         $ongkir = (int) $this->request->getPost('ongkir');
         $grandTotal = $subtotalSetelahDiskon + $ongkir;
 
-        // 4. Masukkan ke tabel transaksi sesuai kolom database aslimu
         $transaction = [
             'username'    => $this->request->getPost('username'),
             'alamat'      => $this->request->getPost('alamat'),
@@ -114,7 +103,6 @@ class TransaksiController extends BaseController
         $this->transactionModel->insert($transaction);
         $transactionId = $this->transactionModel->getInsertID();
 
-        // 5. Masukkan ke detail transaksi
         foreach ($items as $item) {
             $this->transactionDetailModel->insert([
                 'transaction_id' => $transactionId,
@@ -131,7 +119,6 @@ class TransaksiController extends BaseController
             return redirect()->to(base_url('checkout'))->with('error', 'Gagal memproses checkout');
         }
 
-        // Kosongkan keranjang setelah pesanan resmi dibuat
         $this->cart->destroy();
 
         return redirect()->to(base_url('history'))->with('success', 'Transaksi berhasil dibuat!');
@@ -210,17 +197,13 @@ class TransaksiController extends BaseController
 
     public function destinations()
     {
-        // 1. Ambil kata kunci ketikan dari kotak pencarian Select2 (menggunakan 'q')
         $search = $this->request->getGet('q'); 
         
-        // 2. Panggil API Komerce/RajaOngkir untuk mencari daerah
         $service = new \App\Services\RajaOngkirService();
         $response = $service->getDestination($search ?? '');
         
-        // 3. Ambil isi datanya 
         $dataFromApi = $response['data'] ?? $response['results'] ?? [];
         
-        // 4. Ubah formatnya agar bisa dibaca oleh Select2 (Wajib ada 'id' dan 'text')
         $formattedResults = [];
         if (!empty($dataFromApi) && is_array($dataFromApi)) {
             foreach ($dataFromApi as $item) {
@@ -231,7 +214,6 @@ class TransaksiController extends BaseController
             }
         }
 
-        // 5. Kembalikan ke browser dengan bungkus "results"
         return $this->response->setJSON([
             'results' => $formattedResults
         ]);

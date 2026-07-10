@@ -1,36 +1,36 @@
-### Ambil semua data diskon (Read)
+### index
 GET http://localhost:8080/api/discounts
 Accept: application/json
 Authorization: Bearer my-secret-token
 
-### Ambil spesifik 1 data diskon (Misal ID 1)
+### show
 GET http://localhost:8080/api/discounts/1
 Accept: application/json
 Authorization: Bearer my-secret-token
 
-### Tambah data diskon baru (Create)
+### Create
 POST http://localhost:8080/api/discounts
 Accept: application/json
 Authorization: Bearer my-secret-token
 Content-Type: application/json
 
 {
-    "kode_diskon": "PROMO2026",
-    "potongan": 150000
+    "tanggal": "2026-08-30",
+    "nominal": 150000
 }
 
-### Ubah data diskon (Update - Misal ID 1)
+### Update diubah sesuai 
 PUT http://localhost:8080/api/discounts/1
 Accept: application/json
 Authorization: Bearer my-secret-token
 Content-Type: application/json
 
 {
-    "kode_diskon": "PROMOUPDATE",
-    "potongan": 200000
+    "tanggal": "2026-07-15",
+    "nominal": 200000
 }
 
-### Hapus data diskon (Delete - Misal ID 1)
+### Delete 
 DELETE http://localhost:8080/api/discounts/1
 Accept: application/json
 Authorization: Bearer my-secret-token
